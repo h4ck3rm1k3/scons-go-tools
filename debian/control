@@ -1,0 +1,12 @@
+Source: scons-go-tools
+Section: devel
+Priority: extra
+Maintainer: Tonnerre Lombard <tonnerre@ancient-solutions.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Homepage: https://launchpad.net/sconsgo
+
+Package: scons-go-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, scons
+Description: Go build configuration for scons
