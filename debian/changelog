@@ -1,3 +1,9 @@
+scons-go-tools (0.20130728-1) unstable; urgency=low
+
+  * Added cgo support.
+
+ -- Tonnerre Lombard <tonnerre@ancient-solutions.com>  Sun, 28 Jul 2013 22:38:07 +0200
+
 scons-go-tools (0.20120509-1) unstable; urgency=low
 
   * Initial release
