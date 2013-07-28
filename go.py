@@ -87,6 +87,7 @@ def _get_platform_info(env, goos, goarch):
     info['ld'] = info['go'] + ' tool ' + info['archname'] + 'l'
     info['as'] = info['go'] + ' tool ' + info['archname'] + 'a'
     info['cc'] = info['go'] + ' tool ' + info['archname'] + 'c'
+    info['cgo'] = info['go'] + ' tool cgo'
     info['pack'] = info['go'] + ' tool pack'
     return info
 
@@ -202,6 +203,13 @@ def _go_program_prefix(env, sources):
 def _go_program_suffix(env, sources):
     return env['PROGSUFFIX']
 
+cgo_compiler = Builder(
+    action=Action('$GO_CGOCOM', '$GO_CGOCOMSTR'),
+    emitter=_gc_emitter,
+    suffix=_go_object_suffix,
+    ensure_suffix=True,
+    src_suffix='.go',
+)
 go_compiler = Builder(
     action=Action('$GO_GCCOM', '$GO_GCCOMSTR'),
     emitter=_gc_emitter,
@@ -373,6 +381,7 @@ def GoTarget(env, goos, goarch):
     config = _get_platform_info(env, goos, goarch)
     env['ENV']['GOOS'] = goos
     env['ENV']['GOARCH'] = goarch
+    env['GO_CGO'] = config['cgo']
     env['GO_GC'] = config['gc']
     env['GO_LD'] = config['ld']
     env['GO_A'] = config['as']
@@ -394,6 +403,7 @@ def generate(env):
     env.Append(
         BUILDERS={
             'Go': go_compiler,
+            'CGo': cgo_compiler,
             'GoProgram': go_linker,
             'GoAssembly': go_assembler,
             'GoPack': gopack,
@@ -402,6 +412,7 @@ def generate(env):
         SCANNERS=[go_scanner],
         GO_GCCOM='$GO_GC -o $TARGET ${_concat("-I ", GO_LIBPATH, "", __env__)} $GO_GCFLAGS $SOURCES',
         GO_LDCOM='$GO_LD -o $TARGET ${_concat("-L ", GO_LIBPATH, "", __env__)} $GO_LDFLAGS $SOURCE',
+        GO_CGOCOM='$GO_CGO $GO_LDFLAGS -objdir=. $SOURCES',
         GO_ACOM='$GO_A -o $TARGET $SOURCE',
         GO_PACKCOM='rm -f $TARGET ; $GO_PACK gcr $TARGET $SOURCES',
         GO_LIBPATH=[],
