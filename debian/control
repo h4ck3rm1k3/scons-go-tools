@@ -3,7 +3,7 @@ Section: devel
 Priority: extra
 Maintainer: Tonnerre Lombard <tonnerre@ancient-solutions.com>
 Build-Depends: debhelper (>= 8.0.0)
-Standards-Version: 3.9.2
+Standards-Version: 3.9.4
 Homepage: https://launchpad.net/sconsgo
 
 Package: scons-go-tools
