@@ -83,20 +83,22 @@ def _get_platform_info(env, goos, goarch):
     info['archname'] = _archs[goarch]
     info['pkgroot'] = os.path.join(env['ENV']['GOROOT'], 'pkg', goos + '_' + goarch)
     info['go'] = '/' + os.path.join('usr', 'bin', 'go')
-    info['gc'] = info['go'] + ' tool ' + info['archname'] + 'g'
-    info['ld'] = info['go'] + ' tool ' + info['archname'] + 'l'
-    info['as'] = info['go'] + ' tool ' + info['archname'] + 'a'
-    info['cc'] = info['go'] + ' tool ' + info['archname'] + 'c'
+    info['gc'] = 'gccgo'
+    info['ld'] = 'gccgo'
+    info['as'] = 'gcc'
+    info['cc'] = 'gcc'
     info['cgo'] = info['go'] + ' tool cgo'
     info['pack'] = info['go'] + ' tool pack'
     return info
 
 def _get_host_platform(env):
     newenv = env.Clone()
-    newenv['ENV'].pop('GOOS', None)
-    newenv['ENV'].pop('GOARCH', None)
+    #newenv['ENV'].pop('GOOS', None)
+    #newenv['ENV'].pop('GOARCH', None)
     config = _parse_config(_run_goenv(newenv))
-    return config['GOOS'], config['GOARCH']
+    #print config
+    #return config['GOOS'], config['GOARCH']
+    return ('linux', 'amd64')
 
 # COMPILER
 
@@ -266,15 +268,17 @@ def _parse_config(data):
     return result
 
 def _run_goenv(env):
-    proc = subprocess.Popen(
-        ['go', 'env'],
-        cwd=os.path.join(env['ENV']['GOROOT'], 'src'),
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    stdout, stderr = proc.communicate()
-    return stdout
+    # proc = subprocess.Popen(
+    #     ['go', 'env'],
+    #     cwd=os.path.join(env['ENV']['GOROOT'], 'src'),
+    #     stdin=subprocess.PIPE,
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.PIPE,
+    # )
+    # stdout, stderr = proc.communicate()
+    #return stdout
+    return """export GOOS=none
+export GOARCH=something"""
 
 ## TESTING
 
@@ -379,8 +383,8 @@ go_tester = Builder(
 
 def GoTarget(env, goos, goarch):
     config = _get_platform_info(env, goos, goarch)
-    env['ENV']['GOOS'] = goos
-    env['ENV']['GOARCH'] = goarch
+    #env['ENV']['GOOS'] = goos
+    #env['ENV']['GOARCH'] = goarch
     env['GO_CGO'] = config['cgo']
     env['GO_GC'] = config['gc']
     env['GO_LD'] = config['ld']
