@@ -74,7 +74,10 @@ _valid_platforms = frozenset((
     ('nacl', '386'),
     ('windows', '386'),
 ))
-_archs = {'amd64': '6', '386': '8', 'arm': '5'}
+_archs = {
+    'amd64': '6', 
+    '386': '8', 
+    'arm': '5'}
 
 def _get_platform_info(env, goos, goarch):
     info = {}
@@ -83,8 +86,8 @@ def _get_platform_info(env, goos, goarch):
     info['archname'] = _archs[goarch]
     info['pkgroot'] = os.path.join(env['ENV']['GOROOT'], 'pkg', goos + '_' + goarch)
     info['go'] = '/' + os.path.join('usr', 'bin', 'go')
-    info['gc'] = 'gccgo'
-    info['ld'] = 'gccgo'
+    info['gc'] = 'gccgo -g '
+#    info['ld'] = 'gcc '
     info['as'] = 'gcc'
     info['cc'] = 'gcc'
     info['cgo'] = info['go'] + ' tool cgo'
@@ -189,7 +192,7 @@ def _gc_emitter(target, source, env):
         return (target, source)
 
 def _ld_scan_func(node, env, path):
-    obj_suffix = os.path.extsep + env['GO_ARCHNAME']
+    obj_suffix = os.path.extsep  + env['GO_ARCHNAME']
     result = []
     for child in node.children():
         if str(child).endswith(obj_suffix) or str(child).endswith('.a'):
@@ -387,7 +390,7 @@ def GoTarget(env, goos, goarch):
     #env['ENV']['GOARCH'] = goarch
     env['GO_CGO'] = config['cgo']
     env['GO_GC'] = config['gc']
-    env['GO_LD'] = config['ld']
+#    env['GO_LD'] = config['ld']
     env['GO_A'] = config['as']
     env['GO_PACK'] = config['pack']
     env['GO_ARCHNAME'] = config['archname']
@@ -415,7 +418,7 @@ def generate(env):
         },
         SCANNERS=[go_scanner],
         GO_GCCOM='$GO_GC -o $TARGET ${_concat("-I ", GO_LIBPATH, "", __env__)} $GO_GCFLAGS $SOURCES',
-        GO_LDCOM='$GO_LD -o $TARGET ${_concat("-L ", GO_LIBPATH, "", __env__)} $GO_LDFLAGS $SOURCE',
+        #GO_LDCOM='$GO_LD -o $TARGET ${_concat("-L ", GO_LIBPATH, "", __env__)} $GO_LDFLAGS $SOURCE',
         GO_CGOCOM='$GO_CGO $GO_LDFLAGS -objdir=. $SOURCES',
         GO_ACOM='$GO_A -o $TARGET $SOURCE',
         GO_PACKCOM='rm -f $TARGET ; $GO_PACK gcr $TARGET $SOURCES',
